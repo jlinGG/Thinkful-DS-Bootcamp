@@ -1,0 +1,53 @@
+-- Now that you're comfortable with the SQLite database we provided for you, try spinning up your own. Let's use this data set from Airbnb. Pick a city and download the CSV's for that city. 
+-- I picked Washington, DC
+
+-- What's the most expensive listing? What else can you tell me about the listing?
+SELECT * FROM listings
+ORDER BY price DESC
+LIMIT 10
+-- There are 6 listings at $999.  5 accomodates 6+ guests.  One accomodates only 2 guests, but according to the description, listed their apartment during inauguration weekend.  In fact, several of the top most expensive listing are marketed towards visitors coming for the inauguration.
+
+-- What neighborhoods seem to be the most popular?
+SELECT 
+neighbourhood,
+COUNT(*) AS number_of_listings,
+SUM(number_of_reviews) as number_of_reviews,
+AVG(review_scores_rating) AS average_review,
+AVG(review_scores_location) AS average_location_score
+FROM listings
+GROUP BY neighbourhood
+ORDER BY number_of_listings DESC
+-- Capitol Hill has the most listings and the most number of reviews (which can be interpretted as, the most number of guests).  Considering neightborhoods with more than 500 reviews, Friendship Heights has the highest average review (83.3) for its 14 listings. Fort Dupont has the highest average location score (7.17) followed closely by Columbia Heights (7.16).
+
+-- What time of year is the cheapest time to go to your city? What about the busiest?
+WITH seasons AS
+(SELECT date,
+	CASE WHEN date(date) BETWEEN '2017-05-01' AND '2017-05-31' THEN 'Spring'
+			WHEN date(date) BETWEEN '2017,06-01' AND '2017-08-31' THEN 'Summer'
+			WHEN date(date) BETWEEN '2017-09-01' AND '2017-11-30' THEN 'Fall'
+			WHEN date(date) BETWEEN '2017-12-01' AND '2018-02-28' THEN 'Winter'
+			ELSE 'Spring'
+			END AS season
+FROM calendar	),
+
+available AS
+(SELECT * FROM calendar 
+WHERE available = 't'),
+
+busiest AS
+(SELECT * FROM calendar
+WHERE available = 'f')
+
+SELECT 
+s.season,
+AVG(a.price) AS average_price,
+COUNT(b.*) AS unavailable listings
+FROM available a
+LEFT JOIN busiest b
+  ON b.listing_ID = a.listing_ID
+  AND b.date = a.date
+LEFT JOIN seasons s
+ON a.date = s.date
+GROUP BY season
+-- Running this crashed my computer.. but it should work theoretically.
+

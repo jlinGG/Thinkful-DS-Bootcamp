@@ -1,0 +1,40 @@
+-- What was the hottest day in our data set? Where was that?
+SELECT
+	Date,
+	MaxTemperatureF,
+	ZIP
+FROM
+    weather
+ORDER BY 
+	MaxTemperatureF Desc
+LIMIT 1
+-- The hottest day is on November 17, 2015 in zip code 94063
+
+-- How many trips started at each station?
+SELECT
+	start_station,
+	count(*) AS number_of_trips
+FROM
+    trips
+GROUP BY 
+	start_station
+
+-- What's the shortest trip that happened?
+SELECT
+	*
+FROM
+    trips
+ORDER BY 
+	duration
+-- There are several 1 minute trips listed.  
+
+-- What is the average trip duration, by end station?
+SELECT
+	end_station,
+	avg(duration) AS average_duration
+FROM
+    trips
+GROUP BY 
+	end_station
+ORDER BY
+	average_duration
